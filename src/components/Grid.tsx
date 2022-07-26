@@ -2,12 +2,14 @@
 import { useCallback, useState } from "react";
 import styled from 'styled-components';
 import Cell, { StyledCell } from "./Cell";
+import { Turn, Board } from '../types';
 
 const MINIMUM_STEPS_TO_WIN = 5;
 const StyledGrid = styled.div<{ disabled: boolean; }>`
     display: flex;
     flex-direction: column;
     align-items: center;
+
     ${props => props.disabled && `
         ${StyledCell} {
             background: grey;
@@ -24,8 +26,7 @@ interface GridProps {
     size: number;
 }
 
-type Turn = 'X' | 'O';
-type Board = Array<Array<string>>; // TODO: check whether it's a legit approach
+
 interface StateProps {
     turn: Turn;
     finished: boolean;
