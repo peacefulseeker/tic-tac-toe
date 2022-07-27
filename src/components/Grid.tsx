@@ -1,5 +1,5 @@
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import styled from 'styled-components';
 import Cell, { StyledCell } from "./Cell";
 import { Turn, Board } from '../types';
@@ -22,40 +22,45 @@ const Row = styled.div`
     display: flex;
 `;
 
+// NOTE: when having type instead, hovering over gives mo insights on what's expected inside
 interface GridProps {
     size: number;
 }
 
-
-interface StateProps {
-    turn: Turn;
+interface GameStateProps {
     finished: boolean;
     draw: boolean;
+};
+interface BoardStateProps {
+    turn: Turn;
     board: Board;
     currentStep: number;
-}
+};
 
-const initialState: StateProps = {
-    turn: 'X',
+const initialGameState: GameStateProps = {
     finished: false,
     draw: false,
+};
+
+const initialBoardState: BoardStateProps = {
+    turn: 'X',
     board: [],
     currentStep: 1,
 };
 
 export default function Grid({ size }: GridProps) {
-    const [{ turn, finished, board, currentStep, maxSteps, draw }, setGameState] = useState(() => {
+    const maxSteps = useMemo(() => size * size, [size]);
+    const [{ finished, draw }, setGameState] = useState<GameStateProps>(initialGameState);
+    const [{ turn, board, currentStep }, setBoardState] = useState<BoardStateProps>(() => {
         const board: Board = Array(size).fill(null).map(_ => Array(size).fill('-'));
-        const maxSteps = size * size;
         return {
-            ...initialState,
+            ...initialBoardState,
             board,
-            maxSteps,
         };
     });
 
+    // given that it's 3x3 field
     const hasWinner = useCallback((row: number, col: number) => {
-        console.table(board);
         // check horizontally
         // row same, col to check vary
         if (board[row][0] === turn && board[row][1] === turn && board[row][2] === turn) {
@@ -73,16 +78,17 @@ export default function Grid({ size }: GridProps) {
             return true;
         }
         // check 2 diagonal
-        if (board[2][0] === turn && board[1][1] === turn && board[2][0] === turn) {
+        if (board[2][0] === turn && board[1][1] === turn && board[0][2] === turn) {
             return true;
         }
 
-    }, [turn, board]);
+        return false;
+
+    }, [board, turn]); // sort of beneficial, that any method can "watch" latest state of variables listed in dependencies
 
     const onCellClick = useCallback((cellNode: HTMLElement, row: number, col: number) => {
         if (cellNode.textContent) return;
 
-        const nextTurn = turn === 'X' ? 'O' : 'X';
         cellNode.textContent = turn;
         board[row][col] = turn;
 
@@ -91,32 +97,23 @@ export default function Grid({ size }: GridProps) {
         // CAN START CHECKING THE WINNER AT THIS POINT
         if (currentStep >= MINIMUM_STEPS_TO_WIN) {
             if (hasWinner(row, col)) {
-                console.log('FINISHED!');
-                setGameState(prevState => ({
-                    ...prevState,
+                return setGameState({
                     finished: true,
-                }));
-
-                return null;
+                    draw: false,
+                });
             } else if (currentStep === maxSteps) {
-                console.log('DRAW!');
-                setGameState(prevState => ({
-                    ...prevState,
+                return setGameState({
                     finished: true,
                     draw: true,
-                }));
-
-                return null;
+                });
             };
         }
 
-        setGameState(prevState => ({
-            ...prevState,
-            turn: nextTurn,
+        setBoardState({
+            turn: turn === 'X' ? 'O' : 'X',
             board,
             currentStep: currentStep + 1,
-        }));
-
+        });
     }, [turn, board, currentStep, maxSteps, hasWinner]);
 
     return (
