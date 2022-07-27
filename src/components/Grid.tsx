@@ -118,7 +118,7 @@ export default function Grid({ size }: GridProps) {
 
     return (
         <>
-            {finished && <h4>Game finished {draw ? 'and it\'s draw' : `and the winner is ${turn}`}</h4>}
+            {finished && <h4>Game finished and {draw ? 'it\'s a draw' : `the winner is ${turn}`}</h4>}
             <StyledGrid disabled={finished}>
                 {[...Array(size)].map((_, row) => (
                     <Row key={row}>
