@@ -2,7 +2,7 @@
 import { useCallback, useMemo, useState } from "react";
 import styled from 'styled-components';
 import Cell, { StyledCell } from "./Cell";
-import { Turn, Board } from '../types';
+import { Board, GridProps, GameStateProps, BoardStateProps } from '../types';
 
 const MINIMUM_STEPS_TO_WIN = 5;
 const StyledGrid = styled.div<{ disabled: boolean; }>`
@@ -21,21 +21,6 @@ const StyledGrid = styled.div<{ disabled: boolean; }>`
 const Row = styled.div`
     display: flex;
 `;
-
-// NOTE: when having type instead, hovering over gives mo insights on what's expected inside
-interface GridProps {
-    size: number;
-}
-
-interface GameStateProps {
-    finished: boolean;
-    draw: boolean;
-};
-interface BoardStateProps {
-    turn: Turn;
-    board: Board;
-    currentStep: number;
-};
 
 const initialGameState: GameStateProps = {
     finished: false,
@@ -123,7 +108,7 @@ export default function Grid({ size }: GridProps) {
                 {[...Array(size)].map((_, row) => (
                     <Row key={row}>
                         {[...Array(size)].map((_, col) => (
-                            <Cell key={col} size={50} onCellClick={e => onCellClick(e.currentTarget, row, col)} />
+                            <Cell key={col} size={100} onCellClick={e => onCellClick(e.currentTarget, row, col)} />
                         ))}
                     </Row>
                 ))}

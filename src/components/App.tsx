@@ -1,6 +1,11 @@
 import Grid from "./Grid";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 
+const GlobalStyle = createGlobalStyle`
+    body {
+        font-family: Arial;
+    }
+`;
 const Container = styled.div`
     margin: 0 auto;
     width: 1200px;
@@ -8,14 +13,17 @@ const Container = styled.div`
 `;
 
 const Title = styled.h1`
-    font-family: Arial;
+    font-size: 40px;
 `;
 
 export default function App() {
     return (
-        <Container>
-            <Title>Welcome to Tic-Tac-Toe game</Title>
-            <Grid size={3} />
-        </Container>
+        <>
+            <GlobalStyle />
+            <Container>
+                <Title>Welcome to Tic-Tac-Toe game</Title>
+                <Grid size={3} />
+            </Container>
+        </>
     );
 }

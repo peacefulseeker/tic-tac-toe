@@ -14,6 +14,7 @@ export const StyledCell = styled.div<CellProps>`
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: ${props => props.size / 4}px;
 `;
 
 export default function Cell({ size, onCellClick }: CellProps) {
