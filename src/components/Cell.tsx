@@ -1,12 +1,14 @@
 
 import styled from 'styled-components';
+import { Turn } from "../types";
 
 interface CellProps {
     size: number;
-    onCellClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+    value: Turn;
+    onCellClick: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-export const StyledCell = styled.div<CellProps>`
+export const StyledCell = styled.div<{ size: number; }>`
     width: ${props => props.size}px;
     height: ${props => props.size}px;
     box-shadow: 0 0 0 1px coral;
@@ -17,6 +19,6 @@ export const StyledCell = styled.div<CellProps>`
     font-size: ${props => props.size / 4}px;
 `;
 
-export default function Cell({ size, onCellClick }: CellProps) {
-    return <StyledCell size={size} onClick={onCellClick} />;
+export default function Cell({ size, value, onCellClick }: CellProps) {
+    return <StyledCell size={size} onClick={onCellClick}>{value}</StyledCell>;
 }
