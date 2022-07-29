@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { MINIMUM_STEPS_TO_CHECK_WINNER } from "../const";
+import { GAME_FINISHED, GAME_INPROGRESS, MINIMUM_STEPS_TO_CHECK_WINNER } from "../const";
 
 import { Board, BoardStateProps, GameReturnValue, GameState, CellClick } from '../types';
 
@@ -14,7 +14,7 @@ const initialBoardState: BoardStateProps = {
 const useTicTacToe = (gridSize: number): GameReturnValue => {
     const maxSteps = useMemo(() => gridSize * gridSize, [gridSize]);
     const [winner, setWinner] = useState<string | null>(null);
-    const [status, setStatus] = useState<GameState>("inprogress");
+    const [status, setStatus] = useState<GameState>(GAME_INPROGRESS);
 
     const [{ board, cell, turn, currentStep }, setBoardState] = useState<BoardStateProps>(() => {
         const board: Board = Array(gridSize).fill(null).map(_ => Array(gridSize).fill(''));
@@ -48,9 +48,9 @@ const useTicTacToe = (gridSize: number): GameReturnValue => {
 
             if (haveWinner) {
                 setWinner(turn);
-                setStatus("finished");
+                setStatus(GAME_FINISHED);
             } else if (currentStep === maxSteps) {
-                setStatus("finished"); // winner will be `null` in this case which will be an indication of draw
+                setStatus(GAME_FINISHED); // winner will be `null` in this case which will be an indication of draw
             }
         }
 

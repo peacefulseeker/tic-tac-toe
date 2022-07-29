@@ -1,7 +1,7 @@
 import styled, { createGlobalStyle } from "styled-components";
 import useTicTacToe from "../hooks/useTicTacToe";
 import Game from "./Game";
-import { GRID_SIZE } from "../const";
+import { GRID_SIZE, GAME_FINISHED, GAME_INPROGRESS } from "../const";
 
 
 const GlobalStyle = createGlobalStyle`
@@ -31,8 +31,8 @@ export default function App() {
             <GlobalStyle />
             <Container>
                 <Title>Welcome to Tic-Tac-Toe game</Title>
-                {game.status === 'inprogress' && <p>Just start playing</p>}
-                {game.status === 'finished' && (
+                {game.status === GAME_INPROGRESS && <p>Just start playing</p>}
+                {game.status === GAME_FINISHED && (
                     <FinishedHeading>Game finished and {game.winner ? `the winner is ${game.winner}` : 'it\'s a draw'}</FinishedHeading>
                 )}
                 {<Game board={game.board} status={game.status} onCellClick={game.onCellClick} />}
