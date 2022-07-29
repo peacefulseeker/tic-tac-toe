@@ -1,6 +1,8 @@
-# Simle TicTacToe game, built with React/TypeScript
+# TicTacToe on React/TypeScript
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+<img src="https://user-images.githubusercontent.com/25010454/181822346-2fc8c819-89c4-4399-92ad-aadc05c02094.png" width="400"/>
 
 
 ### Grid component:
