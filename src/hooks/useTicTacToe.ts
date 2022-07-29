@@ -1,13 +1,14 @@
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { MINIMUM_STEPS_TO_WIN } from "../const";
+import { MINIMUM_STEPS_TO_CHECK_WINNER } from "../const";
 
-import { Board, BoardStateProps, GameReturnValue, GameState, Turn, CellClick } from '../types';
+import { Board, BoardStateProps, GameReturnValue, GameState, CellClick } from '../types';
 
 const initialBoardState: BoardStateProps = {
     turn: 'X',
     board: [[], [], []],
-    currentStep: 1,
+    currentStep: 0,
+    cell: [],
 };
 
 const useTicTacToe = (gridSize: number): GameReturnValue => {
@@ -15,7 +16,7 @@ const useTicTacToe = (gridSize: number): GameReturnValue => {
     const [winner, setWinner] = useState<string | null>(null);
     const [status, setStatus] = useState<GameState>("inprogress");
 
-    const [{ turn, board, currentStep }, setBoardState] = useState<BoardStateProps>(() => {
+    const [{ board, cell, turn, currentStep }, setBoardState] = useState<BoardStateProps>(() => {
         const board: Board = Array(gridSize).fill(null).map(_ => Array(gridSize).fill(''));
         return {
             ...initialBoardState,
@@ -23,63 +24,51 @@ const useTicTacToe = (gridSize: number): GameReturnValue => {
         };
     });
 
-    // TODO: try with useEffect instead of hasWinner callback
-    // perhaps will need to save pointer in the state with (row,col) clicked value
     useEffect(() => {
-        console.log('board rerendered', board);
-    }, [turn, board, currentStep, maxSteps]);
+        // can start checking winner when after 4th step is over
+        if (currentStep >= MINIMUM_STEPS_TO_CHECK_WINNER) {
+            let haveWinner = false;
+            const [row, col] = cell;
+            const turn = board[row][col];
 
-    // given that it's 3x3 field
-    const hasWinner = useCallback((turn: Turn, board: Board, row: number, col: number) => {
-        // check horizontally
-        // row same, col to check vary
-        if (board[row][0] === turn && board[row][1] === turn && board[row][2] === turn) {
-            return true;
-        }
+            console.log(`Cell [${row}, ${col}]  clicked`, turn, board);
 
-        // check vertically
-        // col same, row to check vary
-        if (board[0][col] === turn && board[1][col] === turn && board[2][col] === turn) {
-            return true;
-        }
+            if (
+                // check horizontally
+                (board[row][0] === turn && board[row][1] === turn && board[row][2] === turn)
+                // check vertically
+                || (board[0][col] === turn && board[1][col] === turn && board[2][col] === turn)
+                // check 1 diagonal
+                || (board[0][0] === turn && board[1][1] === turn && board[2][2] === turn)
+                // check 2 diagonal
+                || (board[2][0] === turn && board[1][1] === turn && board[0][2] === turn)
+            ) {
+                haveWinner = true;
+            }
 
-        // check 1 diagonal
-        if (board[0][0] === turn && board[1][1] === turn && board[2][2] === turn) {
-            return true;
-        }
-        // check 2 diagonal
-        if (board[2][0] === turn && board[1][1] === turn && board[0][2] === turn) {
-            return true;
-        }
-
-        return false;
-
-    }, []);
-
-    const onCellClick = useCallback<CellClick>((row, col) => {
-        if (board[row][col]) return;
-
-        console.log(`Cell [${row}, ${col}]  clicked`, turn);
-
-        const newBoard = board.map(arr => arr.slice());
-        newBoard[row][col] = turn;
-
-        // CAN START CHECKING THE WINNER AT THIS POINT
-        if (currentStep >= MINIMUM_STEPS_TO_WIN) {
-            if (hasWinner(turn, newBoard, row, col)) {
+            if (haveWinner) {
                 setWinner(turn);
                 setStatus("finished");
             } else if (currentStep === maxSteps) {
                 setStatus("finished"); // winner will be `null` in this case which will be an indication of draw
-            };
+            }
         }
 
+    }, [board, maxSteps, cell, currentStep]);
+
+    const onCellClick = useCallback<CellClick>((row, col) => {
+        if (board[row][col]) return;
+
+        const newBoard = board.map(arr => arr.slice());
+        newBoard[row][col] = turn;
+
         setBoardState({
-            turn: turn === 'X' ? 'O' : 'X',
             board: newBoard,
+            cell: [row, col],
+            turn: turn === 'X' ? 'O' : 'X',
             currentStep: currentStep + 1,
         });
-    }, [turn, board, currentStep, maxSteps, hasWinner]);
+    }, [board, turn, currentStep]);
 
     return { board, status, winner, onCellClick };
 };

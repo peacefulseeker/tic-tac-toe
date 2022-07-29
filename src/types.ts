@@ -1,5 +1,5 @@
 export type Turn = 'X' | 'O';
-export type Board = Turn[][]; // shorted equivalent of Array<Array<Turn>>;
+export type Board = Turn[][]; // shorter equivalent of Array<Array<Turn>>;
 
 export type CellClick = (row: number, col: number) => void;
 
@@ -13,6 +13,7 @@ export interface BoardStateProps {
     turn: Turn;
     board: Board;
     currentStep: number;
+    cell: number[];
 };
 
 export interface GameReturnValue {
