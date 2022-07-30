@@ -11,13 +11,17 @@ const initialBoardState: BoardStateProps = {
     cell: [],
 };
 
+const generateBoard = (gridSize: number) => {
+    return Array(gridSize).fill(null).map(_ => Array(gridSize).fill(''));
+};
+
 const useTicTacToe = (gridSize: number): GameReturnValue => {
     const maxSteps = useMemo(() => gridSize * gridSize, [gridSize]);
     const [winner, setWinner] = useState<string | null>(null);
     const [status, setStatus] = useState<GameState>(GAME_INPROGRESS);
 
     const [{ board, cell, turn, currentStep }, setBoardState] = useState<BoardStateProps>(() => {
-        const board: Board = Array(gridSize).fill(null).map(_ => Array(gridSize).fill(''));
+        const board: Board = generateBoard(gridSize);
         return {
             ...initialBoardState,
             board,
@@ -70,7 +74,16 @@ const useTicTacToe = (gridSize: number): GameReturnValue => {
         });
     }, [board, turn, currentStep]);
 
-    return { board, status, winner, onCellClick };
+    const onReset = useCallback(() => {
+        setBoardState({
+            ...initialBoardState,
+            board: generateBoard(gridSize),
+        });
+        setWinner(null);
+        setStatus(GAME_INPROGRESS);
+    }, [gridSize]);
+
+    return { turn, board, status, winner, onCellClick, onReset };
 };
 
 export default useTicTacToe;

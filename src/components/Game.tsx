@@ -10,7 +10,7 @@ const StyledGrid = styled.div<{ disabled: boolean; }>`
 
     ${props => props.disabled && `
         ${StyledCell} {
-            background: #ccc;
+            opacity: .5;
             pointer-events: none;
         }
     `}
@@ -26,7 +26,7 @@ export default function Game({ board, status, onCellClick }: GameProps) {
             {board.map((boardRow: Turn[], rowIndex: number) => (
                 <Row key={rowIndex}>
                     {boardRow.map((turn: Turn, colIndex: number) => (
-                        <Cell key={colIndex} value={turn} size={100} onCellClick={e => onCellClick(rowIndex, colIndex)} />
+                        <Cell key={colIndex} value={turn} size={100} onCellClick={() => onCellClick(rowIndex, colIndex)} />
                     ))}
                 </Row>
             ))}
