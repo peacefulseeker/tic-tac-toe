@@ -33,5 +33,6 @@ export const StyledCell = styled.div<{ size: number; value: string; }>`
 `;
 
 export default function Cell({ size, value, onCellClick }: CellProps) {
+    console.log('random log');
     return <StyledCell value={value} size={size} onClick={onCellClick}>{value}</StyledCell>;
 }
