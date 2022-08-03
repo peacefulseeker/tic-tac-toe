@@ -1,8 +1,8 @@
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { GAME_FINISHED, GAME_INPROGRESS, MINIMUM_STEPS_TO_CHECK_WINNER } from "../const";
+import { GAME_FINISHED, GAME_INPROGRESS, GAME_PENDING } from "../const";
 
-import { Board, BoardStateProps, GameReturnValue, GameState, CellClick } from '../types';
+import { Board, BoardStateProps, GameReturnValue, GameState, CellClick, WinnerLine } from '../types';
 
 const initialBoardState: BoardStateProps = {
     turn: 'X',
@@ -11,54 +11,24 @@ const initialBoardState: BoardStateProps = {
     cell: [],
 };
 
-const generateBoard = (gridSize: number) => {
-    return Array(gridSize).fill(null).map(_ => Array(gridSize).fill(''));
+const generateBoard = (boardSize: number) => {
+    return Array(boardSize).fill(null).map(_ => Array(boardSize).fill(''));
 };
 
-const useTicTacToe = (gridSize: number): GameReturnValue => {
-    const maxSteps = useMemo(() => gridSize * gridSize, [gridSize]);
+const useTicTacToe = (initialBoardSize: number): GameReturnValue => {
+    const [boardSize, setBoardSize] = useState<number>(initialBoardSize);
+    const maxSteps = useMemo(() => boardSize * boardSize, [boardSize]);
+    const minimumStepsToWin = useMemo(() => boardSize + 2, [boardSize]);
     const [winner, setWinner] = useState<string | null>(null);
-    const [status, setStatus] = useState<GameState>(GAME_INPROGRESS);
+    const [status, setStatus] = useState<GameState>(GAME_PENDING);
 
     const [{ board, cell, turn, currentStep }, setBoardState] = useState<BoardStateProps>(() => {
-        const board: Board = generateBoard(gridSize);
+        const board: Board = generateBoard(boardSize);
         return {
             ...initialBoardState,
             board,
         };
     });
-
-    useEffect(() => {
-        // can start checking winner when after 4th step is over
-        if (currentStep >= MINIMUM_STEPS_TO_CHECK_WINNER) {
-            let haveWinner = false;
-            const [row, col] = cell;
-            const turn = board[row][col];
-
-            console.log(`Cell [${row}, ${col}]  clicked`, turn, board);
-
-            if (
-                // check horizontally
-                (board[row][0] === turn && board[row][1] === turn && board[row][2] === turn)
-                // check vertically
-                || (board[0][col] === turn && board[1][col] === turn && board[2][col] === turn)
-                // check 1 diagonal
-                || (board[0][0] === turn && board[1][1] === turn && board[2][2] === turn)
-                // check 2 diagonal
-                || (board[2][0] === turn && board[1][1] === turn && board[0][2] === turn)
-            ) {
-                haveWinner = true;
-            }
-
-            if (haveWinner) {
-                setWinner(turn);
-                setStatus(GAME_FINISHED);
-            } else if (currentStep === maxSteps) {
-                setStatus(GAME_FINISHED); // winner will be `null` in this case which will be an indication of draw
-            }
-        }
-
-    }, [board, maxSteps, cell, currentStep]);
 
     const onCellClick = useCallback<CellClick>((row, col) => {
         if (board[row][col]) return;
@@ -77,13 +47,66 @@ const useTicTacToe = (gridSize: number): GameReturnValue => {
     const onReset = useCallback(() => {
         setBoardState({
             ...initialBoardState,
-            board: generateBoard(gridSize),
+            board: generateBoard(boardSize),
         });
         setWinner(null);
-        setStatus(GAME_INPROGRESS);
-    }, [gridSize]);
+        setStatus(GAME_PENDING);
+    }, [boardSize]);
 
-    return { turn, board, status, winner, onCellClick, onReset };
+
+    // onBoardSize change rebuild the board
+    useEffect(() => {
+        onReset();
+    }, [boardSize, onReset]);
+
+    // check whether there is a winner
+    useEffect(() => {
+        if (currentStep === 0) {
+            return;
+        } else {
+            setStatus(GAME_INPROGRESS);
+        }
+
+        // no point to check winner too early
+        if (currentStep >= minimumStepsToWin) {
+            const [row, col] = cell;
+            console.log(`Cell [${row}, ${col}]  clicked`, board);
+
+            const turn = board[row][col];
+
+            let haveWinner = false;
+            const horizontal: WinnerLine = [];
+            const vertical: WinnerLine = [];
+            const diagonal1: WinnerLine = [];
+            const diagonal2: WinnerLine = [];
+
+            for (let index = 0; index < boardSize; index++) {
+                horizontal.push(board[row][index]);
+                vertical.push(board[index][col]);
+                diagonal1.push(board[index][index]);
+                diagonal2.push(board[index][boardSize - (index + 1)]);
+            }
+
+            if (
+                horizontal.every(val => val === turn)
+                || vertical.every(val => val === turn)
+                || diagonal1.every(val => val === turn)
+                || diagonal2.every(val => val === turn)
+            ) {
+                haveWinner = true;
+            }
+
+            if (haveWinner) {
+                setWinner(turn);
+                setStatus(GAME_FINISHED);
+            } else if (currentStep === maxSteps) {
+                setStatus(GAME_FINISHED); // winner will be `null` in this case which will be an indication of draw
+            }
+        }
+
+    }, [board, cell, currentStep, boardSize, maxSteps, minimumStepsToWin]);
+
+    return { turn, board, status, winner, boardSize, onCellClick, onReset, setBoardSize };
 };
 
 export default useTicTacToe;

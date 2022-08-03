@@ -5,14 +5,14 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 <img src="https://user-images.githubusercontent.com/25010454/181822346-2fc8c819-89c4-4399-92ad-aadc05c02094.png" width="400"/>
 
 
-### Grid component:
+### Game component:
 - takes size property, which will indicate total amount of rows and cols for the game
 
 ### Row component:
 - serves as a visual separator between cells in a row.
 
 ### Cell component:
-- takes size prop, and Grid will be as large, as individual width of row of cells will be
+- takes size prop, and Board will be as large, as individual width of row of cells will be
 
 ### Business logic on cell click:
 - what is the current status of the game? In-progress / Finished(won/lost)?
