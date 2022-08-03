@@ -1,8 +1,9 @@
 # TicTacToe on React/TypeScript
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+With an option to choose a board size(3x3 is the default)
 
-<img src="https://user-images.githubusercontent.com/25010454/181822346-2fc8c819-89c4-4399-92ad-aadc05c02094.png" width="400"/>
+<img src="https://user-images.githubusercontent.com/25010454/182554789-a129a10b-86ee-4b8d-850e-65f85ee3b5b5.png" width="300"/>
+<img src="https://user-images.githubusercontent.com/25010454/182554775-1ae68860-c229-4524-a7ed-0d8454c2a49b.png" width="254"/>
 
 
 ### Game component:
