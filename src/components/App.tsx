@@ -53,7 +53,7 @@ export default function App() {
         <>
             <GlobalStyle />
             <Container>
-                <Title>Welcome to Tic-Tac-Toe game</Title>
+                <Title>Welcome to Tic-Tac-Toe game(aka Noughts and Crosses)</Title>
                 {game.status !== GAME_FINISHED && (
                     <>
                         {game.status === GAME_INPROGRESS && <h3>Game started!</h3>}
